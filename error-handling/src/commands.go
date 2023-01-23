@@ -13,7 +13,7 @@ type ITypeValidator interface {
 type Name string
 
 func (c Name) Validate() error {
-	if len(c) < 10 {
+	if len([]rune(c)) < 10 {
 		return errors.New("name is not valid")
 	}
 	return nil
