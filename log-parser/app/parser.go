@@ -3,40 +3,42 @@ package app
 import (
 	"bufio"
 	"fmt"
+	"os"
 	"time"
 )
 
 const (
-	ChunkSize = 100
-	LogLines  = 100000000
+	BufferSize = 4 * 1024 * 1024 // 4MB
 )
 
 type LogParser struct {
-	reader *bufio.Reader
+	scanner *bufio.Scanner
 }
 
 func NewLogParser(file *LogFile) *LogParser {
-	reader := bufio.NewReader(file.file)
-	return &LogParser{reader: reader}
+	scanner := bufio.NewScanner(file.file)
+	scanner.Buffer(make([]byte, BufferSize), BufferSize)
+	return &LogParser{scanner: scanner}
 }
 
 func (p *LogParser) Parse() {
-	iteration := LogLines / ChunkSize
-	for i := 0; i < iteration; i++ {
-		chunk := (i + 1) * 100
-		p.parseChunk(chunk)
-		// we should pars and delegate storing data to another function and async
-		time.Sleep(time.Second * 3)
-	}
+	startTime := time.Now()
+	p.parseChunk()
+	endTime := time.Now()
+	fmt.Println("Duration: ", endTime.Sub(startTime).String())
 }
 
-func (p *LogParser) parseChunk(chunk int) {
-	fmt.Printf("iteration chunk: #%v\n", chunk)
-	for j := 0; j < ChunkSize; j++ {
-		line, _, err := p.reader.ReadLine()
-		if err != nil {
-			break
-		}
-		fmt.Printf("#%v======:%v\n", chunk+j, string(line))
+func (p *LogParser) parseChunk() {
+	number := 1
+	for p.scanner.Scan() {
+		line := p.scanner.Text()
+		// process line
+		fmt.Printf("%v read line: %v\n", number, line)
+		number++
+	}
+	fmt.Println("Finished: #", number)
+	if err := p.scanner.Err(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
