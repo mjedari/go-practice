@@ -8,6 +8,9 @@ import (
 	"time"
 )
 
+const RETRIY_TIMES = 10
+const RETRY_DELAY = time.Second * 2
+
 func main() {
 
 	// want to initiate one instance of storage client
@@ -18,11 +21,12 @@ func main() {
 		client, err := storage.NewRedis("localhost", "1212")
 
 		return client, err
-	}, 10, time.Second*2)(ctx)
+	}, RETRIY_TIMES, RETRY_DELAY)(ctx)
 
 	if err != nil {
 		panic(err)
 	}
+	// here we convert interface datatype to redis.Client
 	redisRetry.(*redis.Client).Ping(ctx)
 
 }
