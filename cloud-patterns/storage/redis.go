@@ -11,6 +11,8 @@ type Redis struct {
 	*redis.Client
 }
 
+// we want to implement retry pattern in redis connection
+
 func NewRedis(host, port string) (*redis.Client, error) {
 	log.Print("trying to connect redis on: ", host, port)
 	client := redis.NewClient(&redis.Options{

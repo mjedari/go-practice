@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-const RETRIY_TIMES = 10
-const RETRY_DELAY = time.Second * 2
+const RetryTimes = 10
+const RetryDelay = time.Second * 2
 
 func main() {
 
@@ -21,7 +21,7 @@ func main() {
 		client, err := storage.NewRedis("localhost", "1212")
 
 		return client, err
-	}, RETRIY_TIMES, RETRY_DELAY)(ctx)
+	}, RetryTimes, RetryDelay)(ctx)
 
 	if err != nil {
 		panic(err)
